@@ -32,6 +32,16 @@ export const useMemoryGame = () => {
     if (!gameState.isStarted) return;
 
     setGameState(prevState => {
+      // Check if all pairs are matched except the unpaired card
+      const allPairsMatched = prevState.cards
+        .filter(card => !card.isUnpaired)
+        .every(card => card.isMatched);
+
+      // If clicked card is unpaired, only allow if all pairs are matched
+      if (clickedCard.isUnpaired && !allPairsMatched) {
+        return prevState;
+      }
+
       // Ignore clicks if card is already flipped, matched, or we already have 2 cards flipped
       if (
         clickedCard.isFlipped ||
@@ -110,7 +120,9 @@ export const useMemoryGame = () => {
                 ? { ...card, isMatched: true }
                 : card
             ),
-            flippedCards: []
+            flippedCards: [],
+            isGameOver: true,
+            endTime: Date.now()
           }));
         }, 500);
       }
