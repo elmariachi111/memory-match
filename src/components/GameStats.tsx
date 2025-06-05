@@ -1,25 +1,32 @@
 import React from 'react';
 import { formatTime } from '../utils/gameHelpers';
-import { Clock, Mouse, Play } from 'lucide-react';
+import { Clock, Mouse, Play, UserPlus } from 'lucide-react';
 
 interface GameStatsProps {
   moves: number;
   gameTime: number;
   startGame: () => void;
   isGameStarted: boolean;
+  showAddToProfile: boolean;
 }
 
-const GameStats: React.FC<GameStatsProps> = ({ moves, gameTime, startGame, isGameStarted }) => {
+const GameStats: React.FC<GameStatsProps> = ({ 
+  moves, 
+  gameTime, 
+  startGame, 
+  isGameStarted,
+  showAddToProfile 
+}) => {
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center justify-center w-full mb-6">
-      <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-md">
+      <div className={`flex items-center bg-white rounded-full px-4 py-2 shadow-md transition-transform ${showAddToProfile ? 'animate-wiggle' : ''}`}>
         <Mouse className="w-5 h-5 mr-2 text-indigo-600" />
         <span className="font-semibold text-gray-800">
           Moves: <span className="font-mono">{moves}</span>
         </span>
       </div>
       
-      <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-md">
+      <div className={`flex items-center bg-white rounded-full px-4 py-2 shadow-md transition-transform ${showAddToProfile ? 'animate-wiggle' : ''}`}>
         <Clock className="w-5 h-5 mr-2 text-blue-600" />
         <span className="font-semibold text-gray-800">
           Time: <span className="font-mono">{formatTime(gameTime)}</span>
@@ -35,6 +42,17 @@ const GameStats: React.FC<GameStatsProps> = ({ moves, gameTime, startGame, isGam
         >
           <Play className="w-4 h-4" />
           Start Game
+        </button>
+      )}
+
+      {showAddToProfile && (
+        <button
+          className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
+                    font-medium py-2 px-4 rounded-full shadow-md hover:from-green-600 
+                    hover:to-emerald-700 transition-all duration-300 hover:shadow-lg animate-fade-in"
+        >
+          <UserPlus className="w-4 h-4" />
+          Add to Profile
         </button>
       )}
     </div>

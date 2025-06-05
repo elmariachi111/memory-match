@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import GameBoard from './GameBoard';
 import GameStats from './GameStats';
 import GameOverModal from './GameOverModal';
 import { useMemoryGame } from '../hooks/useMemoryGame';
 import { BrainCircuit } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 const MemoryGame: React.FC = () => {
+  const [showAddToProfile, setShowAddToProfile] = useState(false);
   const {
     cards,
     moves,
@@ -13,8 +15,21 @@ const MemoryGame: React.FC = () => {
     gameTime,
     handleCardClick,
     startGame,
-    isGameStarted
+    isGameStarted,
+    lastMatchedCard
   } = useMemoryGame();
+
+  useEffect(() => {
+    if (lastMatchedCard?.isUnpaired) {
+      // Trigger confetti
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+      setShowAddToProfile(true);
+    }
+  }, [lastMatchedCard]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 
@@ -34,6 +49,7 @@ const MemoryGame: React.FC = () => {
         gameTime={gameTime} 
         startGame={startGame}
         isGameStarted={isGameStarted}
+        showAddToProfile={showAddToProfile}
       />
 
       <div className="relative w-full">

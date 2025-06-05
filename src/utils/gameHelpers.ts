@@ -39,7 +39,8 @@ export const createDeck = (): CardType[] => {
     id: 24,
     value: selectedSymbols[12],
     isFlipped: false,
-    isMatched: false
+    isMatched: false,
+    isUnpaired: true
   };
   
   // Combine and shuffle

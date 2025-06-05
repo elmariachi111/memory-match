@@ -22,6 +22,10 @@
   .animate-fade-in-up {
     animation: fade-in-up 0.5s ease-out forwards;
   }
+
+  .animate-wiggle {
+    animation: wiggle 0.5s ease-in-out;
+  }
 }
 
 @keyframes fade-in-up {
@@ -33,6 +37,12 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
 }
 
 body {

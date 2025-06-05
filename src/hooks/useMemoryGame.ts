@@ -12,6 +12,7 @@ export const useMemoryGame = () => {
     endTime: null,
     isStarted: false
   });
+  const [lastMatchedCard, setLastMatchedCard] = useState<CardType | null>(null);
 
   const startGame = useCallback(() => {
     setGameState({
@@ -23,6 +24,7 @@ export const useMemoryGame = () => {
       endTime: null,
       isStarted: true
     });
+    setLastMatchedCard(null);
   }, []);
 
   // Handle card click
@@ -97,6 +99,22 @@ export const useMemoryGame = () => {
         };
       }
 
+      // Check if this is the unpaired card
+      if (clickedCard.isUnpaired) {
+        setTimeout(() => {
+          setLastMatchedCard(clickedCard);
+          setGameState(prev => ({
+            ...prev,
+            cards: prev.cards.map(card =>
+              card.id === clickedCard.id
+                ? { ...card, isMatched: true }
+                : card
+            ),
+            flippedCards: []
+          }));
+        }, 500);
+      }
+
       // First card flip
       return {
         ...prevState,
@@ -120,6 +138,7 @@ export const useMemoryGame = () => {
     gameTime,
     handleCardClick,
     startGame,
-    isGameStarted: gameState.isStarted
+    isGameStarted: gameState.isStarted,
+    lastMatchedCard
   };
 };

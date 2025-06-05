@@ -3,6 +3,7 @@ export interface CardType {
   value: string;
   isFlipped: boolean;
   isMatched: boolean;
+  isUnpaired?: boolean;
 }
 
 export interface GameState {
