@@ -37,7 +37,7 @@ export const useMemoryGame = () => {
         .filter(card => !card.isUnpaired)
         .every(card => card.isMatched);
 
-      // If clicked card is unpaired, only allow if all pairs are matched
+      // If clicked card is unpaired and not all pairs are matched, ignore the click
       if (clickedCard.isUnpaired && !allPairsMatched) {
         return prevState;
       }
@@ -56,6 +56,30 @@ export const useMemoryGame = () => {
         card.id === clickedCard.id ? { ...card, isFlipped: true } : card
       );
 
+      // If this is the unpaired card and all pairs are matched
+      if (clickedCard.isUnpaired && allPairsMatched) {
+        setTimeout(() => {
+          setLastMatchedCard(clickedCard);
+          setGameState(prev => ({
+            ...prev,
+            cards: prev.cards.map(card =>
+              card.id === clickedCard.id
+                ? { ...card, isFlipped: true, isMatched: true }
+                : card
+            ),
+            flippedCards: [],
+            isGameOver: true,
+            endTime: Date.now()
+          }));
+        }, 500);
+
+        return {
+          ...prevState,
+          cards: updatedCards,
+          moves: prevState.moves + 1
+        };
+      }
+
       const updatedFlippedCards = [...prevState.flippedCards, clickedCard];
 
       // If we have 2 cards flipped, check for a match
@@ -72,16 +96,11 @@ export const useMemoryGame = () => {
                   ? { ...card, isMatched: true }
                   : card
               );
-
-              // Check if all cards are matched to end the game
-              const allMatched = matchedCards.every(card => card.isMatched);
               
               return {
                 ...prev,
                 cards: matchedCards,
-                flippedCards: [],
-                isGameOver: allMatched,
-                endTime: allMatched ? Date.now() : null
+                flippedCards: []
               };
             });
           }, 500);
@@ -107,24 +126,6 @@ export const useMemoryGame = () => {
           flippedCards: updatedFlippedCards,
           moves: prevState.moves + 1
         };
-      }
-
-      // Check if this is the unpaired card
-      if (clickedCard.isUnpaired) {
-        setTimeout(() => {
-          setLastMatchedCard(clickedCard);
-          setGameState(prev => ({
-            ...prev,
-            cards: prev.cards.map(card =>
-              card.id === clickedCard.id
-                ? { ...card, isMatched: true }
-                : card
-            ),
-            flippedCards: [],
-            isGameOver: true,
-            endTime: Date.now()
-          }));
-        }, 500);
       }
 
       // First card flip
