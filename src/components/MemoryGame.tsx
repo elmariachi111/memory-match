@@ -3,7 +3,7 @@ import GameBoard from './GameBoard';
 import GameStats from './GameStats';
 import GameOverModal from './GameOverModal';
 import { useMemoryGame } from '../hooks/useMemoryGame';
-import { BrainCircuit } from 'lucide-react';
+import { BrainCircuit, Pause } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const MemoryGame: React.FC = () => {
@@ -16,7 +16,8 @@ const MemoryGame: React.FC = () => {
     handleCardClick,
     startGame,
     isGameStarted,
-    lastMatchedCard
+    lastMatchedCard,
+    isPaused
   } = useMemoryGame();
 
   useEffect(() => {
@@ -50,6 +51,7 @@ const MemoryGame: React.FC = () => {
         startGame={startGame}
         isGameStarted={isGameStarted}
         showAddToProfile={showAddToProfile}
+        isPaused={isPaused}
       />
 
       <div className="relative w-full">
@@ -63,6 +65,20 @@ const MemoryGame: React.FC = () => {
             <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg">
               <p className="text-lg font-medium text-gray-800">
                 Click the Start Game button to begin!
+              </p>
+            </div>
+          </div>
+        )}
+
+        {isPaused && isGameStarted && !isGameOver && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 shadow-lg border-2 border-orange-200">
+              <div className="flex items-center gap-3 mb-2">
+                <Pause className="w-6 h-6 text-orange-600" />
+                <p className="text-xl font-semibold text-gray-800">Game Paused</p>
+              </div>
+              <p className="text-gray-600 text-center">
+                Click any card to resume playing
               </p>
             </div>
           </div>

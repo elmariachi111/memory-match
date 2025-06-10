@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, CardType } from '../types/game';
 import { createDeck } from '../utils/gameHelpers';
 
@@ -13,6 +13,10 @@ export const useMemoryGame = () => {
     isStarted: false
   });
   const [lastMatchedCard, setLastMatchedCard] = useState<CardType | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
+  const [pausedTime, setPausedTime] = useState(0);
+  const lastActivityRef = useRef<number>(Date.now());
+  const inactivityTimeoutRef = useRef<NodeJS.Timeout>();
 
   const startGame = useCallback(() => {
     setGameState({
@@ -25,11 +29,45 @@ export const useMemoryGame = () => {
       isStarted: true
     });
     setLastMatchedCard(null);
+    setIsPaused(false);
+    setPausedTime(0);
+    lastActivityRef.current = Date.now();
   }, []);
+
+  // Reset inactivity timer
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimeoutRef.current) {
+      clearTimeout(inactivityTimeoutRef.current);
+    }
+    
+    if (gameState.isStarted && !gameState.isGameOver) {
+      lastActivityRef.current = Date.now();
+      
+      // If game was paused, resume it
+      if (isPaused) {
+        setIsPaused(false);
+        // Adjust start time to account for paused duration
+        const pauseDuration = Date.now() - lastActivityRef.current;
+        setGameState(prev => ({
+          ...prev,
+          startTime: prev.startTime ? prev.startTime + pauseDuration : null
+        }));
+      }
+
+      // Set new inactivity timeout
+      inactivityTimeoutRef.current = setTimeout(() => {
+        setIsPaused(true);
+        setPausedTime(Date.now());
+      }, 15000); // 15 seconds
+    }
+  }, [gameState.isStarted, gameState.isGameOver, isPaused]);
 
   // Handle card click
   const handleCardClick = useCallback((clickedCard: CardType) => {
     if (!gameState.isStarted) return;
+
+    // Reset inactivity timer on any card click
+    resetInactivityTimer();
 
     setGameState(prevState => {
       // Check if all pairs are matched except the unpaired card
@@ -135,14 +173,29 @@ export const useMemoryGame = () => {
         flippedCards: updatedFlippedCards
       };
     });
-  }, [gameState.isStarted]);
+  }, [gameState.isStarted, resetInactivityTimer]);
+
+  // Initialize inactivity timer when game starts
+  useEffect(() => {
+    if (gameState.isStarted && !gameState.isGameOver) {
+      resetInactivityTimer();
+    }
+
+    return () => {
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current);
+      }
+    };
+  }, [gameState.isStarted, gameState.isGameOver, resetInactivityTimer]);
 
   // Calculate game statistics
   const gameTime = gameState.endTime && gameState.startTime
     ? gameState.endTime - gameState.startTime
-    : gameState.startTime
+    : gameState.startTime && !isPaused
       ? Date.now() - gameState.startTime
-      : 0;
+      : gameState.startTime && isPaused && pausedTime
+        ? pausedTime - gameState.startTime
+        : 0;
 
   return {
     cards: gameState.cards,
@@ -152,6 +205,7 @@ export const useMemoryGame = () => {
     handleCardClick,
     startGame,
     isGameStarted: gameState.isStarted,
-    lastMatchedCard
+    lastMatchedCard,
+    isPaused
   };
 };

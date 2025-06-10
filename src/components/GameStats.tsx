@@ -1,6 +1,6 @@
 import React from 'react';
 import { formatTime } from '../utils/gameHelpers';
-import { Clock, Mouse, Play, UserPlus } from 'lucide-react';
+import { Clock, Mouse, Play, UserPlus, Pause } from 'lucide-react';
 
 interface GameStatsProps {
   moves: number;
@@ -8,6 +8,7 @@ interface GameStatsProps {
   startGame: () => void;
   isGameStarted: boolean;
   showAddToProfile: boolean;
+  isPaused?: boolean;
 }
 
 const GameStats: React.FC<GameStatsProps> = ({ 
@@ -15,7 +16,8 @@ const GameStats: React.FC<GameStatsProps> = ({
   gameTime, 
   startGame, 
   isGameStarted,
-  showAddToProfile 
+  showAddToProfile,
+  isPaused = false
 }) => {
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center justify-center w-full mb-6">
@@ -26,9 +28,10 @@ const GameStats: React.FC<GameStatsProps> = ({
         </span>
       </div>
       
-      <div className={`flex items-center bg-white rounded-full px-4 py-2 shadow-md transition-transform ${showAddToProfile ? 'animate-wiggle' : ''}`}>
-        <Clock className="w-5 h-5 mr-2 text-blue-600" />
-        <span className="font-semibold text-gray-800">
+      <div className={`flex items-center bg-white rounded-full px-4 py-2 shadow-md transition-transform ${showAddToProfile ? 'animate-wiggle' : ''} ${isPaused ? 'bg-orange-50 border-2 border-orange-200' : ''}`}>
+        {isPaused && <Pause className="w-4 h-4 mr-2 text-orange-600" />}
+        <Clock className={`w-5 h-5 mr-2 ${isPaused ? 'text-orange-600' : 'text-blue-600'}`} />
+        <span className={`font-semibold ${isPaused ? 'text-orange-800' : 'text-gray-800'}`}>
           Time: <span className="font-mono">{formatTime(gameTime)}</span>
         </span>
       </div>
