@@ -32,6 +32,11 @@ const MemoryGame: React.FC = () => {
     }
   }, [lastMatchedCard]);
 
+  const handleCardClickWithResume = (card: any) => {
+    // If paused, clicking any card will resume the game
+    handleCardClick(card);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 
                    flex flex-col items-center p-4 md:p-8">
@@ -57,7 +62,7 @@ const MemoryGame: React.FC = () => {
       <div className="relative w-full">
         <GameBoard 
           cards={cards} 
-          onCardClick={handleCardClick} 
+          onCardClick={handleCardClickWithResume} 
         />
 
         {!isGameStarted && !isGameOver && (
@@ -72,9 +77,9 @@ const MemoryGame: React.FC = () => {
 
         {isPaused && isGameStarted && !isGameOver && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 shadow-lg border-2 border-orange-200">
+            <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 shadow-lg border-2 border-yellow-300">
               <div className="flex items-center gap-3 mb-2">
-                <Pause className="w-6 h-6 text-orange-600" />
+                <Pause className="w-6 h-6 text-yellow-600" />
                 <p className="text-xl font-semibold text-gray-800">Game Paused</p>
               </div>
               <p className="text-gray-600 text-center">

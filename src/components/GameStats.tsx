@@ -28,10 +28,10 @@ const GameStats: React.FC<GameStatsProps> = ({
         </span>
       </div>
       
-      <div className={`flex items-center bg-white rounded-full px-4 py-2 shadow-md transition-transform ${showAddToProfile ? 'animate-wiggle' : ''} ${isPaused ? 'bg-orange-50 border-2 border-orange-200' : ''}`}>
-        {isPaused && <Pause className="w-4 h-4 mr-2 text-orange-600" />}
-        <Clock className={`w-5 h-5 mr-2 ${isPaused ? 'text-orange-600' : 'text-blue-600'}`} />
-        <span className={`font-semibold ${isPaused ? 'text-orange-800' : 'text-gray-800'}`}>
+      <div className={`flex items-center rounded-full px-4 py-2 shadow-md transition-all duration-300 ${showAddToProfile ? 'animate-wiggle' : ''} ${isPaused ? 'bg-yellow-100 border-2 border-yellow-300' : 'bg-white'}`}>
+        {isPaused && <Pause className="w-4 h-4 mr-2 text-yellow-700" />}
+        <Clock className={`w-5 h-5 mr-2 ${isPaused ? 'text-yellow-700' : 'text-blue-600'}`} />
+        <span className={`font-semibold ${isPaused ? 'text-yellow-800' : 'text-gray-800'}`}>
           Time: <span className="font-mono">{formatTime(gameTime)}</span>
         </span>
       </div>
