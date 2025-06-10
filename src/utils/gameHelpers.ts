@@ -1,4 +1,5 @@
 import { CardType } from '../types/game';
+import { TOTAL_CARDS, PAIRS_COUNT, HAS_UNPAIRED_CARD } from '../constants/gameConfig';
 
 // Card symbols using emoji for visual appeal
 const cardSymbols = [
@@ -6,7 +7,12 @@ const cardSymbols = [
   '🎮', '🎨', '🎯', '🎵', '🎪',
   '🏄', '🚴', '🛶', '🏂', '🏆', 
   '🍕', '🍦', '🧁', '🍹', '🌮', 
-  '🐱', '🐶', '🦊', '🐢', '🦄'
+  '🐱', '🐶', '🦊', '🐢', '🦄',
+  '⚽', '🏀', '🎾', '🏐', '🏈',
+  '🎲', '🎯', '🎪', '🎭', '🎨',
+  '🌺', '🌻', '🌷', '🌹', '🌼',
+  '🍎', '🍊', '🍋', '🍌', '🍇',
+  '🦋', '🐝', '🐞', '🦗', '🕷️'
 ];
 
 // Fisher-Yates shuffle algorithm
@@ -19,32 +25,34 @@ export const shuffleArray = <T>(array: T[]): T[] => {
   return newArray;
 };
 
-// Create a new deck of cards
+// Create a new deck of cards based on the configured grid size
 export const createDeck = (): CardType[] => {
-  // For a 5x5 grid, we need 25 cards (12 pairs + 1 unpaired card)
-  // Or we could use 12 unique symbols with each appearing twice, plus one symbol appearing once
-  // Let's go with 12 pairs and one unpaired for a fair game
+  // Calculate how many unique symbols we need
+  const symbolsNeeded = HAS_UNPAIRED_CARD ? PAIRS_COUNT + 1 : PAIRS_COUNT;
   
-  // Select 13 symbols randomly from our symbol set
-  const selectedSymbols = shuffleArray(cardSymbols).slice(0, 13);
+  // Select symbols randomly from our symbol set
+  const selectedSymbols = shuffleArray(cardSymbols).slice(0, symbolsNeeded);
   
-  // Create pairs for the first 12 symbols
-  const pairedCards = selectedSymbols.slice(0, 12).flatMap((symbol, index) => [
+  // Create pairs for the paired symbols
+  const pairedCards = selectedSymbols.slice(0, PAIRS_COUNT).flatMap((symbol, index) => [
     { id: index * 2, value: symbol, isFlipped: false, isMatched: false },
     { id: index * 2 + 1, value: symbol, isFlipped: false, isMatched: false }
   ]);
   
-  // Add the last unpaired card
-  const unpaired = {
-    id: 24,
-    value: selectedSymbols[12],
-    isFlipped: false,
-    isMatched: false,
-    isUnpaired: true
-  };
+  // Add the unpaired card if needed
+  const cards = [...pairedCards];
+  if (HAS_UNPAIRED_CARD) {
+    cards.push({
+      id: TOTAL_CARDS - 1,
+      value: selectedSymbols[PAIRS_COUNT],
+      isFlipped: false,
+      isMatched: false,
+      isUnpaired: true
+    });
+  }
   
-  // Combine and shuffle
-  return shuffleArray([...pairedCards, unpaired]);
+  // Shuffle and return
+  return shuffleArray(cards);
 };
 
 // Format time in MM:SS format

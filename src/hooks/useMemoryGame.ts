@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, CardType } from '../types/game';
 import { createDeck } from '../utils/gameHelpers';
+import { GAME_CONFIG, HAS_UNPAIRED_CARD } from '../constants/gameConfig';
 
 export const useMemoryGame = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -57,7 +58,7 @@ export const useMemoryGame = () => {
       inactivityTimeoutRef.current = setTimeout(() => {
         setIsPaused(true);
         setPauseStartTime(Date.now());
-      }, 15000); // 15 seconds
+      }, GAME_CONFIG.INACTIVITY_TIMEOUT);
     }
   }, [gameState.isStarted, gameState.isGameOver, isPaused, pauseStartTime]);
 
@@ -69,7 +70,7 @@ export const useMemoryGame = () => {
     resetInactivityTimer();
 
     setGameState(prevState => {
-      // Check if all pairs are matched except the unpaired card
+      // Check if all pairs are matched (excluding unpaired card if it exists)
       const allPairsMatched = prevState.cards
         .filter(card => !card.isUnpaired)
         .every(card => card.isMatched);
@@ -134,10 +135,17 @@ export const useMemoryGame = () => {
                   : card
               );
               
+              // Check if game is over (all cards matched)
+              const gameComplete = HAS_UNPAIRED_CARD 
+                ? matchedCards.filter(card => !card.isUnpaired).every(card => card.isMatched)
+                : matchedCards.every(card => card.isMatched);
+              
               return {
                 ...prev,
                 cards: matchedCards,
-                flippedCards: []
+                flippedCards: [],
+                isGameOver: gameComplete && !HAS_UNPAIRED_CARD,
+                endTime: gameComplete && !HAS_UNPAIRED_CARD ? Date.now() : null
               };
             });
           }, 500);
